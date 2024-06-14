@@ -1,0 +1,52 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+class SegTree{
+    public:
+    vector<int> seg;
+    SegTree(int n){
+        seg.resize(4*n+1);
+    }
+    
+    void buildTree(int ind, int low, int high, vector<int> &inp){
+        if(low==high){
+            seg[ind] = inp[low];
+            return;
+        }
+        int mid = (low + high)/2;
+        buildTree(2*ind+1, low, mid, inp);
+        buildTree(2*ind+2, mid+1, high, inp);
+        seg[ind] = min(seg[2*ind+1], seg[2*ind+2]);
+        return;
+    }
+    
+    int query(int ind, int low, int high, int l, int r){
+        if(low>r || high<l){
+            return INT_MAX;
+        }
+        else if(l<=low && high<=r){
+            return seg[ind];
+        }
+        else{
+            int mid = (low + high)/2;
+            int left = query(2*ind+1, low, mid, l, r);
+            int right = query(2*ind+2, mid+1, high, l, r);
+            return min(left, right);
+        }
+    }
+    
+    void update(int ind, int low, int high, int key, int val){
+        if(low==high && low==key){
+            seg[ind] = val;
+            return;
+        }
+        int mid = (low + high)/2;
+        if(key<=mid){
+            update(2*ind+1, low, mid, key, val);
+        }
+        else{
+            update(2*ind+2, mid+1, high, key, val);
+        }
+        seg[ind] = min(seg[2*ind+1], seg[2*ind+2]);
+    }
+};
